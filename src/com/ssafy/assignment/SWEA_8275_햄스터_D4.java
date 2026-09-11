@@ -67,7 +67,7 @@ public class SWEA_8275_햄스터_D4 {
 //			System.out.println(i+":"+selectCnt);
 			multicombi(selectCnt + 1, i);
 			cages[i]++;
-
+sadasdas
 			
 		}
 
