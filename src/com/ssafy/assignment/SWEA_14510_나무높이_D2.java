@@ -33,44 +33,39 @@ public class SWEA_14510_나무높이_D2 {
 			}
 			
 			int res = 0;
-			// [0]: 0 , [1] : 높이 1 남은 나무 카운트, [2] : 높이 2 남은 나무 카운트
-			int[] RemainedDayCnt =new int[3];
+			
 			
 			int[] needHeight = new int[N];
 			
-			for (int i = 0; i < N; i++) {
-				// 홀,짝 날을 하나로 묶어서 높이가 1이나 2남을때까지 다써버리기
-				res += 2*((maxHeight - trees[i])/3);
-				needHeight[i] = ((maxHeight - trees[i])%3);	
-				
-				RemainedDayCnt[needHeight[i]]++;
-				
-			}
-			
-			
-			if(RemainedDayCnt[1] > RemainedDayCnt[2]) {
-				
-				int diff = RemainedDayCnt[1] - RemainedDayCnt[2];
-				
-				res += 2*(diff)-1;
-				
-				res += 2*RemainedDayCnt[2];
+			int odd =0; // 반드시 홀수날 물 줘야하는 개
+			int even =0; // 짝수날 물 줄개
+			for (int i = 0; i < N; i++) {			
+				needHeight[i] = ((maxHeight - trees[i]));	
+				if(needHeight[i] % 2 != 0) {
+					odd++;
+				}
+				even += needHeight[i]/2;
 				
 				
-			}else if (RemainedDayCnt[1] <= RemainedDayCnt[2]){
-				int diff = RemainedDayCnt[2] - RemainedDayCnt[1];
-				
-
-				res += 4*(diff/3);
-				
-				if((diff%3)==1)
-					res += 2;
-				else if((diff%3)== 2)
-					res += 3;
+			}     
 		
-				res += 2*RemainedDayCnt[1];
-
+			int min = Math.min(odd,even);
+			
+			res = min *2;
+			
+			odd -= min;
+			even -= min;
+			
+			if (odd > even) { // 홀수날이 많은 경우
+				res += odd * 2 - 1;
+			} else if (odd < even) { // 짝수날이 많은 경우
+				res += even / 3 * 4; // _ㅉ_ㅉ_ㅉ => ㅎㅉㅎㅉ
+				if      (even % 3 == 1) res += 2;
+				else if (even % 3 == 2) res += 3;
+			} else { // odd == even 아무것도 안하면 됨
+				
 			}
+			
 			
 			System.out.println("#"+tc+" "+res);
 			
