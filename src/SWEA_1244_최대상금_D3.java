@@ -3,9 +3,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
-
-import javax.swing.plaf.synth.SynthOptionPaneUI;
-
 /*
  * 접근:
  * 
