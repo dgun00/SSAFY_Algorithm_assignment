@@ -1,99 +1,166 @@
 package com.personal.solve;
 
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
-class Solution {
+public class Solution {
 
 	static int N;
-	static int SCORERANGE = 11;
+	static int M;
+	static int[][] matrix;
+	static int[][] putSeedDay;
+	static int[][] putSeedCnt;
 
-	static int[] apichi;
-	static int[] lion = new int[SCORERANGE];
+	static int maxHarvest;
+	// 오른쪽, 앞쪽, 왼쪽, 뒤쪽의 순서
+	static int[] dys = { 0, -1, 0, 1 };
+	static int[] dxs = { 1, 0, -1, 0 };
 
-	// 최종res넣는 배열
-	static int[] res = new int[SCORERANGE];
+	static int curX = -1;
+	static int curY = -1;
 
-	static int maxDiff = Integer.MIN_VALUE;
-	static boolean flag = false;
+	// 1 : 산 , 2 : 싹,곡식
 
-	static public void scoreCompare() {
+	public static boolean canGo(int x, int y, int day) {
 
-		int apichiSc = 0;
-		int lionSc = 0;
-
-		for (int i = 0; i < SCORERANGE; i++) {
-
-			if (apichi[i] == 0 && lion[i] == 0)
-				continue;
-
-			if (apichi[i] >= lion[i]) {
-				apichiSc += 10 - i;
-			} else
-				lionSc += 10 - i;
+		// 범위
+		if (x < 0 || y < 0 || x >= N || y >= N) {
+			return false;
 		}
-		
-		int diff = lionSc - apichiSc;
-		// 라이언이 이기면(diff가 양수)
-		if (diff > 0) {   
-			
-			if(diff > maxDiff) { // 기존 차이보다 커질때 갱신
-				maxDiff = diff;
-				res = lion.clone();
-				flag = true;
-			}
-			
-			// 최대 차이 갱신
-			if (maxDiff == diff) {// 차이가 같을 때 
-				maxDiff = diff;
-
-				// 작은 인덱스가 더 많은 배열을 선택
-				for (int i = 10; i >= 0; i--) {
-					if (lion[i] > res[i]) {
-						res = lion.clone();
-						break;
-					} else if (lion[i] < res[i]) { // 작은 점수부터 탐색햇을떄 기존 답이 작은 점수가 더 많을때 break
-						break;
-					}
-				}
-
-				// 한 번이라도 이기면 flag = true
-				flag = true;
-			}
+		// 1 : 산 ,
+		else if (matrix[y][x] == 1) {
+			return false;
+		} else if (matrix[y][x] == 2) {
+			// 심었는데 아직 안열렸으면 false
+			if ((day - putSeedDay[y][x]) < (3 + putSeedCnt[y][x]))
+				return false;
 		}
 
+		return true;
 	}
 
-	// 라이언이 가질 수 있는 모든 조합 (중복조합 생성)
-	static public void multicombination(int idx, int start) {
-
-		if (idx == N) {
-			// 화살 다 쐇으면 그 경우의 수 가지고 어피치랑 비교
-			scoreCompare();
+	public static void dfs(int day, int harvest, int dirsIdx) {
+		if (day == M) {
+			maxHarvest= Math.max(maxHarvest, harvest);
 			return;
 		}
 
-		for (int i = start; i < SCORERANGE; i++) {
-			lion[i] += 1;
+		// s남은 날로 안될떄 가지치기 추가
 
-			multicombination(idx + 1, i);
-			lion[i] -= 1;
+		int nx;
+		int ny;
 
+		int newdirsIdx = dirsIdx;
+
+		boolean goFlag = false;
+		// 현재 방향부터 오른쪽,위,왼,아래 부터 가도록 함
+		while (true) {
+
+			if (dirsIdx == 4) {
+				break;
+			}
+			newdirsIdx = (dirsIdx + 3) % 4;
+
+			nx = curX + dxs[newdirsIdx];
+			ny = curY + dys[newdirsIdx];
+			if (canGo(nx, ny, day)) {
+				goFlag = true;
+
+				break;
+			}
+			dirsIdx++;
+		}
+
+		if (goFlag) {
+			// 이동하기전에 현재 농지라면 씨뿌리기
+			if (matrix[curY][curX] == 0) {
+				matrix[curY][curX] = 2;
+
+				putSeedDay[curY][curX] = day;
+				curX = curX + dxs[newdirsIdx];
+				curY = curY + dys[newdirsIdx];
+				dfs(day + 1, harvest, newdirsIdx);
+
+				// 이동하기전에 현재 곡식이라면 빈농지로 만들기
+			} else if (matrix[curY][curX] == 2) {
+
+				matrix[curY][curX] = 0;
+				
+				// 씨 뿌린날 제거
+				putSeedDay[curY][curX] = 0;
+				putSeedCnt[curY][curX]++;
+				
+				curX = curX + dxs[newdirsIdx];
+				curY = curY + dys[newdirsIdx];
+				dfs(day + 1, harvest + 1, newdirsIdx);
+			}
+		}else {
+			// 가만히
+			dfs(day + 1, harvest, newdirsIdx);
 		}
 
 	}
 
-	public int[] solution(int n, int[] info) {
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		apichi = info.clone();
-		N = n;
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-		multicombination(0, 0);
+		int TC = Integer.parseInt(st.nextToken());
 
-		// 한 번이라도 못 이겼으면 [-1] 리턴
-		if (flag == false) {
-			return new int[] { -1 };
+		for (int tc = 1; tc <= TC; tc++) {
+
+			st = new StringTokenizer(br.readLine());
+
+			N = Integer.parseInt(st.nextToken());
+			M = Integer.parseInt(st.nextToken());
+
+			matrix = new int[N][N];
+
+			putSeedDay = new int[N][N];
+			putSeedCnt = new int[N][N];
+			maxHarvest = Integer.MIN_VALUE;
+			// matrix 초기화
+			for (int j = 0; j < N; j++) {
+				st = new StringTokenizer(br.readLine());
+				for (int i = 0; i < N; i++) {
+					matrix[j][i] = Integer.parseInt(st.nextToken());
+				}
+			}
+			
+			int[][] originalMatrix = new int[N][N];
+			
+			for (int i = 0; i < matrix.length; i++) {
+				originalMatrix[i] = matrix[i].clone(); // 또는 System.arraycopy(...)
+			}
+			
+			// 농지에서부터 시작
+			for (int j = 0; j < N - 1; j++) {
+				for (int i = 0; i < N - 1; i++) {
+					if (matrix[j][i] == 0) {
+						matrix = new int[N][N];
+						for (int k = 0; k < matrix.length; k++) {
+							matrix[k] = originalMatrix[k].clone(); // 또는 System.arraycopy(...)
+						}
+						curX = i;
+						curY = j;
+						// 모든 방향 시작
+						for (int dir = 0; dir < 4; dir++) {
+							dfs(0, 0, dir);
+						}
+
+					}
+				}
+			}
+			
+			System.out.println("#"+tc+" "+maxHarvest);
 		}
 
-		return res;
-	}
-}
+		
+		
+	}// end of main
+
+}// end of class;
