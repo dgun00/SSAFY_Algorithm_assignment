@@ -95,7 +95,7 @@ public class SWEA_1953_탈주범검거_Dx {
 			int curX = polled[1];
 			int curL = polled[2];
 			
-			// L시간까지 갈수잇느거 다구햇으면 다음 큐
+			// L시간까지 갈수잇느거 다구햇으면 스킵하고 다음 큐로
 			if(curL == L)continue;			
 		
 			
@@ -125,6 +125,7 @@ public class SWEA_1953_탈주범검거_Dx {
 					}
 				}
 				
+				// 다음 파이프모양이 연결 못하면 continue
 				if(!flag)continue;
 				
 				// 다 가능하다면 큐에 넣기
