@@ -36,10 +36,10 @@ public class SWEA_1953_탈주범검거_Dx {
 			{true,true,true,true},
 			{true,false,true,false},
 			{false,true,false,true},
-			{false,false,true,true},
-			{true,true,false,false},
 			{true,true,false,false},
 			{false,true,true,false},
+			{false,false,true,true},
+			{true,false,false,true},
 			
 			
 	};
@@ -84,6 +84,7 @@ public class SWEA_1953_탈주범검거_Dx {
 		Deque<int[]> q = new ArrayDeque<>();
 
 		q.offer(new int[] { R, C, 1});
+		visited[R][C]=true;
 		res+=1;
 		
 		while (!q.isEmpty()) {
@@ -94,10 +95,9 @@ public class SWEA_1953_탈주범검거_Dx {
 			int curX = polled[1];
 			int curL = polled[2];
 			
-			// L시간까지 갈수잇느거 다구햇으면 break
-			if(curL == L+1)break;
-			
-			visited[curY][curX] = true;
+			// L시간까지 갈수잇느거 다구햇으면 다음 큐
+			if(curL == L)continue;			
+		
 			
 			
 			int pipeShape = grid[curY][curX];
@@ -132,9 +132,7 @@ public class SWEA_1953_탈주범검거_Dx {
 				res++;
 				visited[ny][nx] = true;
 				
-				
-				curX=nx;
-				curY=ny;
+		
 
 			}
 
