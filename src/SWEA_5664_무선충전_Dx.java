@@ -9,8 +9,8 @@ public class SWEA_5664_무선충전_Dx {
 	static int[] dys = { 0, -1, 0, 1, 0 };
 	static int[] dxs = { 0, 0, 1, 0, -1 };
 	static int[][] BCInfos;
-	static int[] inBC;
-
+	static boolean[] AinBC;
+	static boolean[] BinBC;
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -21,11 +21,12 @@ public class SWEA_5664_무선충전_Dx {
 			int M = Integer.parseInt(infos[0]);
 			int A = Integer.parseInt(infos[1]);
 
-			int[][] map = new int[10][10];
+			
 
 			int[] AMove = new int[M + 1];
 			int[] BMove = new int[M + 1];
-
+			
+			int res =0;
 			// 맨 처음 움직임 0
 			AMove[0] = 0;
 			BMove[0] = 0;
@@ -58,31 +59,40 @@ public class SWEA_5664_무선충전_Dx {
 
 			}
 
-			int[] aPos = new int[] { 0, 0 };
-			int[] bPos = new int[] { 9, 9 };
+			int[] aPos = new int[] { 1, 1 };
+			int[] bPos = new int[] { 10, 10 };
 
-			inBC = new int[A];
 			
+
 			for (int i = 0; i <= M; i++) {
 				// 이번턴 a,b 좌표들
-//				int curAx = aPos[0]+dxs[AMove[i]];
-//				int curAy = aPos[1]+dys[AMove[i]];
-//				
-//				int curBx = bPos[0]+dxs[BMove[i]];
-//				int curBy = bPos[1]+dys[BMove[i]];
 
 				aPos[0] = aPos[0] + dxs[AMove[i]];
 				aPos[1] = aPos[1] + dys[AMove[i]];
 
 				bPos[0] = bPos[0] + dxs[BMove[i]];
 				bPos[1] = bPos[1] + dys[BMove[i]];
-
+					
+				AinBC = new boolean[A];
+				BinBC = new boolean[A];
 				cntInBc(aPos, bPos);
-				
-				if~(inBC배열에서 두개이상 겹치면 ~~~ 분배~~~or~~)
-				
+				int best = 0;
+				for (int a = -1; a < A; a++) {              // -1 = A는 아무것도 안 고름
+				    if (a >= 0 && !AinBC[a]) continue;
+				    for (int b = -1; b < A; b++) {          // -1 = B는 아무것도 안 고름
+				        if (b >= 0 && !BinBC[b]) continue;
 
+				        int sum;
+				        if (a == b && a >= 0) sum = BCInfos[a][3];   // 같은 BC → 반씩, 합은 P
+				        else sum = (a >= 0 ? BCInfos[a][3] : 0) + (b >= 0 ? BCInfos[b][3] : 0);
+
+				        best = Math.max(best, sum);
+				    }
+				}
+				res += best;
 			}
+			
+			System.out.println("#"+tc+" "+res);
 		} // end of tc
 
 	}// end of main
@@ -95,12 +105,12 @@ public class SWEA_5664_무선충전_Dx {
 
 			// 충전기 범위 안일때
 			if (Math.abs(aPos[0] - BCx) + Math.abs(aPos[1] - BCy) <= BCr) {
-				inBC[i]++;
+				AinBC[i]=true;
 			}
 
 			// 충전기 범위 안일때
 			if (Math.abs(bPos[0] - BCx) + Math.abs(bPos[1] - BCy) <= BCr) {
-				inBC[i]++;
+				BinBC[i]=true;
 			}
 
 		}
