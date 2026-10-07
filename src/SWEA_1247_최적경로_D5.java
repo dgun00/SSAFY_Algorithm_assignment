@@ -6,15 +6,17 @@ import java.util.*;
 public class SWEA_1247_최적경로_D5 {
 
 	public static class Edge {
-		int from;
+		int to;
 		int dist;
 
-		public Edge(int from, int dist) {
+		public Edge(int to, int dist) {
 			super();
-			this.from = from;
+			this.to = to;
 			this.dist = dist;
 		}
 	}
+	
+	
 
 	static int[][] posAry;
 
@@ -25,9 +27,10 @@ public class SWEA_1247_최적경로_D5 {
 
 		for (int tc = 1; tc <= TC; tc++) {
 			int N = Integer.parseInt(br.readLine());
-
+			
+			
 			posAry = new int[N][2];
-
+			
 			String[] posInfo = br.readLine().split(" ");
 
 			int[] st = new int[] { Integer.parseInt(posInfo[0]), Integer.parseInt(posInfo[1]) };
@@ -39,18 +42,24 @@ public class SWEA_1247_최적경로_D5 {
 				posAry[idx][1] = Integer.parseInt(posInfo[i + 1]);
 				idx++;
 			}
-
-			ArrayList<Edge>[] adjList = new ArrayList[N + 1];
-
-			for (int i = 0; i < N+1; i++) {
-				for(int j=0; j<N+1; j++) {
-					if(i==j)continue;
-					// 
-					adjList[i].add(new Edge(j,getDist(i,j)));
-				}
+			PriorityQueue<Edge> pq = new PriorityQueue<>((a,b)-> a.dist - b.dist);
+			int[] minDist = new int[N];
+			
+			Arrays.fill(minDist, Integer.MAX_VALUE);
+			
+			
+			for(int i=0; i<N; i++) {
+				// 시작 점 전부 해보기
+				minDist[i] = Math.abs(st[i] - posAry[0][0]) + Math.abs(st[i] - posAry[0][1]);
+				
+				
 				
 			}
-
+			
+			
+			
+			
+			
 		}// end of tc
 	}// end of main
 
